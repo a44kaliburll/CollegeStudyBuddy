@@ -4,16 +4,23 @@ import type { Semester } from '../types'
 import { addDays, formatDate, parseISO, semesterTotalWeeks, todayISO, toISODate, uid } from '../utils'
 import { Btn, cx, DeleteBtn, Field, Modal, TextInput } from './ui'
 
-/** Typical US term shapes — picking one prefills name + length, everything stays editable */
+/** Typical US term shapes. Presets only prefill a name and length; dates remain editable. */
 const TERM_PRESETS = [
-  { emoji: '🍂', season: 'Fall', weeks: 15 },
-  { emoji: '❄️', season: 'Winter', weeks: 4 },
-  { emoji: '🌸', season: 'Spring', weeks: 15 },
-  { emoji: '☀️', season: 'Summer', weeks: 8 },
+  { emoji: '🍂', label: 'Fall', name: 'Fall', weeks: 15 },
+  { emoji: '❄️', label: 'Winter', name: 'Winter', weeks: 4 },
+  { emoji: '🌸', label: 'Spring', name: 'Spring', weeks: 15 },
+  { emoji: '☀️', label: 'Summer', name: 'Summer', weeks: 8 },
+  { emoji: '1️⃣', label: 'Trimester 1', name: 'Trimester 1', weeks: 12 },
+  { emoji: '2️⃣', label: 'Trimester 2', name: 'Trimester 2', weeks: 12 },
+  { emoji: '3️⃣', label: 'Trimester 3', name: 'Trimester 3', weeks: 12 },
 ] as const
 
 export function semesterEmoji(name: string): string {
   const n = name.toLowerCase()
+  if (n.includes('trimester 1') || n.includes('first trimester')) return '1️⃣'
+  if (n.includes('trimester 2') || n.includes('second trimester')) return '2️⃣'
+  if (n.includes('trimester 3') || n.includes('third trimester')) return '3️⃣'
+  if (n.includes('trimester')) return '🔺'
   if (n.includes('fall') || n.includes('autumn')) return '🍂'
   if (n.includes('winter')) return '❄️'
   if (n.includes('spring')) return '🌸'
@@ -30,7 +37,7 @@ export function SemesterManagerModal({ open, onClose }: { open: boolean; onClose
 
   const applyPreset = (preset: (typeof TERM_PRESETS)[number]) => {
     const startDate = parseISO(start)
-    setName(`${preset.season} ${startDate.getFullYear()}`)
+    setName(`${preset.name} ${startDate.getFullYear()}`)
     setEnd(toISODate(addDays(startDate, preset.weeks * 7 - 1)))
   }
 
@@ -54,7 +61,7 @@ export function SemesterManagerModal({ open, onClose }: { open: boolean; onClose
             <div
               key={x.id}
               className={cx(
-                'flex items-center gap-3 rounded-2xl px-3.5 py-2.5',
+                'flex flex-wrap items-center gap-3 rounded-2xl px-3.5 py-2.5 sm:flex-nowrap',
                 x.id === s.activeSemesterId
                   ? 'bg-brand-50 ring-2 ring-brand-300 dark:bg-brand-500/10 dark:ring-brand-500/40'
                   : 'bg-slate-50 dark:bg-slate-800/60',
@@ -70,15 +77,17 @@ export function SemesterManagerModal({ open, onClose }: { open: boolean; onClose
                   {formatDate(x.startDate)} – {formatDate(x.endDate)} · {semesterTotalWeeks(x)} weeks · {s.courses.filter((c) => c.semesterId === x.id).length} courses
                 </div>
               </div>
-              {x.id !== s.activeSemesterId && (
-                <Btn variant="ghost" className="!px-2.5 !py-1 !text-xs" onClick={() => s.setActiveSemester(x.id)}>Switch</Btn>
-              )}
-              <Btn variant="ghost" className="!px-2.5 !py-1 !text-xs" onClick={() => setEditingId(x.id)} title="Edit name & dates">✏️</Btn>
-              <DeleteBtn small onDelete={() => s.deleteSemesterCascade(x.id)} />
+              <div className="ml-auto flex items-center gap-1">
+                {x.id !== s.activeSemesterId && (
+                  <Btn variant="ghost" className="!min-h-11 !px-3 !py-1 !text-xs" onClick={() => s.setActiveSemester(x.id)}>Switch</Btn>
+                )}
+                <Btn variant="ghost" className="!min-h-11 !min-w-11 !px-2.5 !py-1 !text-xs" onClick={() => setEditingId(x.id)} title="Edit name & dates">✏️</Btn>
+                <DeleteBtn small onDelete={() => s.deleteSemesterCascade(x.id)} />
+              </div>
             </div>
           ),
         )}
-        {semesters.length === 0 && <p className="py-2 text-center text-sm font-semibold text-slate-400">No semesters yet — create one below.</p>}
+        {semesters.length === 0 && <p className="py-2 text-center text-sm font-semibold text-slate-400">No terms yet. Create one below.</p>}
       </div>
 
       <div className="mt-5 rounded-2xl bg-slate-50 p-4 dark:bg-slate-800/60">
@@ -86,23 +95,23 @@ export function SemesterManagerModal({ open, onClose }: { open: boolean; onClose
         <div className="mb-3 flex flex-wrap gap-1.5">
           {TERM_PRESETS.map((p) => (
             <button
-              key={p.season}
+              key={p.label}
               type="button"
               onClick={() => applyPreset(p)}
-              className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-600 ring-1 ring-slate-900/10 transition hover:bg-brand-50 hover:text-brand-700 dark:bg-slate-700 dark:text-slate-200 dark:ring-white/10 dark:hover:bg-slate-600"
+              className="min-h-11 rounded-full bg-white px-3 py-2 text-xs font-bold text-slate-600 ring-1 ring-slate-900/10 transition hover:bg-brand-50 hover:text-brand-700 dark:bg-slate-700 dark:text-slate-200 dark:ring-white/10 dark:hover:bg-slate-600"
               title={`${p.weeks}-week term from the start date`}
             >
-              {p.emoji} {p.season} · {p.weeks} wk
+              {p.emoji} {p.label} · {p.weeks} wk
             </button>
           ))}
         </div>
         <div className="grid gap-3">
-          <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Fall 2026" />
-          <div className="grid grid-cols-2 gap-3">
+          <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Trimester 1 2026" />
+          <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Starts"><TextInput type="date" value={start} onChange={(e) => setStart(e.target.value)} /></Field>
             <Field label="Ends"><TextInput type="date" value={end} onChange={(e) => setEnd(e.target.value)} /></Field>
           </div>
-          <Btn variant="primary" onClick={create} disabled={!name.trim() || end <= start}>Create {name.trim() || 'semester'}</Btn>
+          <Btn variant="primary" onClick={create} disabled={!name.trim() || end <= start}>Create {name.trim() || 'term'}</Btn>
         </div>
       </div>
     </Modal>
@@ -124,8 +133,8 @@ function SemesterEditor({ sem, onDone }: { sem: Semester; onDone: () => void }) 
   return (
     <div className="rounded-2xl bg-brand-50 p-3 ring-2 ring-brand-300 dark:bg-brand-500/10 dark:ring-brand-500/40">
       <div className="grid gap-2">
-        <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="Semester name" autoFocus />
-        <div className="grid grid-cols-2 gap-2">
+        <TextInput value={name} onChange={(e) => setName(e.target.value)} placeholder="Term name" autoFocus />
+        <div className="grid gap-2 sm:grid-cols-2">
           <TextInput type="date" value={start} onChange={(e) => setStart(e.target.value)} />
           <TextInput type="date" value={end} onChange={(e) => setEnd(e.target.value)} />
         </div>
