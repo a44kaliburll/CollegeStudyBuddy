@@ -5,8 +5,6 @@
 @theme {
   --font-display: "Baloo 2", "Segoe UI", system-ui, sans-serif;
   --font-sans: "Nunito", "Segoe UI", system-ui, sans-serif;
-
-  /* Playful brand palette (UI chrome — charts use the validated viz palette) */
   --color-brand-50: #f3f1ff;
   --color-brand-100: #e9e5ff;
   --color-brand-200: #d5cdff;
@@ -17,27 +15,22 @@
   --color-brand-700: #5e1ddd;
   --color-brand-800: #4e18b9;
   --color-brand-900: #421697;
-
   --color-sun-100: #fff3c4;
   --color-sun-400: #ffc93c;
   --color-sun-500: #ffb020;
-
   --color-bubble-100: #ffe1ec;
   --color-bubble-400: #ff7eb0;
   --color-bubble-500: #f75590;
-
   --color-mint-100: #d5f6e8;
   --color-mint-400: #34d39b;
   --color-mint-500: #10b981;
-
   --color-sky2-100: #d9f0ff;
   --color-sky2-400: #38bdf8;
 }
 
-/* ---------- App surfaces (retinted by school-colors mode) ---------- */
 :root {
-  --sp: #7c4dfa; /* school primary — set from Settings when school mode is on */
-  --ss: #f75590; /* school secondary */
+  --sp: #7c4dfa;
+  --ss: #f75590;
   --page-bg: #faf8ff;
   --sidebar-bg: rgba(255, 255, 255, 0.7);
   --card-bg: #ffffff;
@@ -48,31 +41,17 @@
   --card-bg: #0f172a;
 }
 
-/* School-colors mode: surfaces become modern gradients of the school palette.
-   Light mode blends the colors toward white; dark mode blends them toward near-black.
-   The primary/secondary hues themselves stay the main accent colors. */
 :root[data-accent='school'] {
-  --page-bg: linear-gradient(
-    130deg,
-    color-mix(in oklab, var(--sp) 14%, #ffffff) 0%,
-    color-mix(in oklab, var(--sp) 5%, #fdfdfc) 42%,
-    color-mix(in oklab, var(--ss) 16%, #ffffff) 100%
-  );
+  --page-bg: linear-gradient(130deg, color-mix(in oklab, var(--sp) 14%, #ffffff) 0%, color-mix(in oklab, var(--sp) 5%, #fdfdfc) 42%, color-mix(in oklab, var(--ss) 16%, #ffffff) 100%);
   --sidebar-bg: color-mix(in srgb, var(--sp) 8%, rgba(255, 255, 255, 0.72));
   --card-bg: color-mix(in oklab, var(--sp) 2%, #ffffff);
 }
 :root[data-accent='school'].dark {
-  --page-bg: linear-gradient(
-    130deg,
-    color-mix(in oklab, var(--sp) 36%, #06060b) 0%,
-    color-mix(in oklab, var(--sp) 14%, #090910) 45%,
-    color-mix(in oklab, var(--ss) 18%, #06060b) 100%
-  );
+  --page-bg: linear-gradient(130deg, color-mix(in oklab, var(--sp) 36%, #06060b) 0%, color-mix(in oklab, var(--sp) 14%, #090910) 45%, color-mix(in oklab, var(--ss) 18%, #06060b) 100%);
   --sidebar-bg: color-mix(in srgb, var(--sp) 20%, rgba(4, 4, 10, 0.55));
   --card-bg: color-mix(in oklab, var(--sp) 13%, #0d0d15);
 }
 
-/* ---------- Chart / data-viz roles (validated palette from the dataviz skill) ---------- */
 :root {
   --viz-surface: #fcfcfb;
   --viz-text-primary: #0b0b0b;
@@ -110,31 +89,27 @@
   --series-8: #d95926;
 }
 
-html, body, #root {
-  height: 100%;
-}
-
+html, body, #root { height: 100%; height: 100dvh; }
+html { background: var(--page-bg); }
 body {
+  margin: 0;
+  min-width: 320px;
+  overflow: hidden;
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
+button, input, select, textarea { font: inherit; }
+button { touch-action: manipulation; }
+input, select, textarea { font-size: 16px; }
+h1, h2, h3, .font-display { font-family: var(--font-display); }
 
-h1, h2, h3, .font-display {
-  font-family: var(--font-display);
-}
-
-/* Subtle playful scrollbar */
 ::-webkit-scrollbar { width: 10px; height: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: color-mix(in oklab, var(--color-brand-400) 40%, transparent);
-  border-radius: 999px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in oklab, var(--color-brand-400) 65%, transparent);
-}
+::-webkit-scrollbar-thumb { background: color-mix(in oklab, var(--color-brand-400) 40%, transparent); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: color-mix(in oklab, var(--color-brand-400) 65%, transparent); }
 
-/* Gentle pop-in for cards & modals */
 @keyframes pop-in {
   from { opacity: 0; transform: translateY(6px) scale(0.98); }
   to { opacity: 1; transform: translateY(0) scale(1); }
@@ -146,3 +121,16 @@ h1, h2, h3, .font-display {
   100% { transform: translateY(80px) rotate(320deg); opacity: 0; }
 }
 .confetti { animation: confetti-fall 0.9s ease-in both; }
+
+@media (max-width: 640px) {
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
