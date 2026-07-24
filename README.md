@@ -1,5 +1,9 @@
 # 🎒 Campus Hub — Student Planner
 
+[![Build and deploy Campus Hub](https://github.com/a44kaliburll/CollegeStudyBuddy/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/a44kaliburll/CollegeStudyBuddy/actions/workflows/deploy-pages.yml)
+
+**Live app:** [https://a44kaliburll.github.io/CollegeStudyBuddy/](https://a44kaliburll.github.io/CollegeStudyBuddy/)
+
 A fully featured, playful planner for college students. Campus Hub runs locally in your browser, works on desktop and Android, and stores your information on your device with no account required.
 
 ## ✨ Features
