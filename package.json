@@ -1,7 +1,7 @@
 {
   "name": "campus-hub",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Campus Hub — a playful, fully featured college student planner. Local-only data, no accounts.",
   "author": "a44kaliburll",
   "type": "module",
